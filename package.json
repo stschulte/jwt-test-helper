@@ -1,0 +1,59 @@
+{
+  "name": "jwt-test-helper",
+  "version": "0.9.0",
+  "description": "Create different JSON Web Tokens for tests",
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "./dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./issuer.js": {
+      "types": "./dist/issuer.d.ts",
+      "default": "./dist/issuer.js"
+    },
+    "./issuer/entraid.js": {
+      "types": "./dist/issuer/entraid.d.ts",
+      "default": "./dist/issuer/entraid.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint -c ./eslint.config.js .",
+    "lint:fix": "eslint -c ./eslint.config.js --fix .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "validate": "tsc --noEmit",
+    "all": "npm run lint && npm run build && npm run test:coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stschulte/jwt-test-helper.git"
+  },
+  "author": "Stefan Schulte <stschulte@posteo.de>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stschulte/jwt-test-helper/issues"
+  },
+  "homepage": "https://github.com/stschulte/jwt-test-helper#readme",
+  "dependencies": {
+    "nock": "^13.5.4",
+    "tslib": "^2.6.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.4.0",
+    "@types/node": "^20.14.2",
+    "@vitest/coverage-v8": "^1.6.0",
+    "eslint": "^8.57.0",
+    "eslint-config-flat-gitignore": "^0.1.5",
+    "eslint-plugin-perfectionist": "^2.10.0",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.12.0",
+    "vitest": "^1.6.0"
+  }
+}
