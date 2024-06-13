@@ -51,9 +51,9 @@
     "@vitest/coverage-v8": "^1.6.0",
     "eslint": "^8.57.0",
     "eslint-config-flat-gitignore": "^0.1.5",
-    "eslint-plugin-perfectionist": "^2.10.0",
+    "eslint-plugin-perfectionist": "^2.11.0",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.12.0",
+    "typescript-eslint": "^7.13.0",
     "vitest": "^1.6.0"
   }
 }
