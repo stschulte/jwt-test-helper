@@ -3,9 +3,12 @@ import { KeyObject, generateKeyPairSync } from 'node:crypto'
 import { get } from 'node:https'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { BaseIssuer, FakeKey, Issuer, jwsToCryptoAlgorithm } from '../../src/issuer.js'
-import { JWK, JWKSet } from '../../src/jwk.js'
-import { JOSEHeader, JWSAlgorithm, JWTClaims } from '../../src/jwt.js'
+import type { FakeKey } from '../../src/issuer.js'
+import type { JWK, JWKSet } from '../../src/jwk.js'
+import type { JOSEHeader, JWSAlgorithm, JWTClaims } from '../../src/jwt.js'
+
+import { BaseIssuer, Issuer, jwsToCryptoAlgorithm } from '../../src/issuer.js'
+import { rsaKeyToJwk } from '../../src/jwk.js'
 
 async function fetchJwk(url: string): Promise<JWKSet> {
   return new Promise((resolve, reject) => {
@@ -32,17 +35,7 @@ async function fetchJwk(url: string): Promise<JWKSet> {
 
 class SimpleIssuer extends BaseIssuer {
   keyToJwk(key: FakeKey): JWK {
-    const { e, n } = key.publicKey.export({ format: 'jwk' })
-    if (!e || !n) {
-      throw new Error("keyToJWK was called without an RSA key at least we do not have 'e' and 'n'")
-    }
-
-    return {
-      e,
-      "kid": key.kid,
-      "kty": 'RSA',
-      n
-    }
+    return rsaKeyToJwk(key.kid, key.publicKey)
   }
 
   sampleHeader(): JOSEHeader {
@@ -116,7 +109,7 @@ describe("issuer", () => {
         expect(result.signature).toBeUndefined()
       })
 
-      it("sets issuer", () => {
+      it("sets the issuer of the created JWT", () => {
         const issuer = new SimpleIssuer("https://example.com/keys.json")
         const result = issuer.createJwt({ alg: 'none' }, { iss: 'https://example.com', sub: 'Alice' })
         expect(result.issuer).toBe(issuer)
@@ -124,7 +117,7 @@ describe("issuer", () => {
     })
 
     describe("createSampleJwt", () => {
-      it("uses sampleHeader and samplePayload", () => {
+      it("uses sampleHeader and samplePayload of the issuer", () => {
         const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
         issuer.addKey('SAMPLEKID', privateKey, publicKey)
         const jwt = issuer.createSampleJwt()
@@ -133,7 +126,7 @@ describe("issuer", () => {
         expect(jwt.signature).toBeUndefined()
       })
 
-      it("uses merges header and payload with sample", () => {
+      it("merges provided header and payload with sample header and payload", () => {
         const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
         issuer.addKey('SAMPLEKID', privateKey, publicKey)
         const jwt = issuer.createSampleJwt({ kid: 'OTHERKID', typ: 'JWT' }, { aud: 'https://example.com', sub: 'Bob' })
@@ -142,7 +135,7 @@ describe("issuer", () => {
         expect(jwt.signature).toBeUndefined()
       })
 
-      it("sets the issuer", () => {
+      it("sets the issuer of the created token", () => {
         const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
         issuer.addKey('SAMPLEKID', privateKey, publicKey)
         const jwt = issuer.createSampleJwt()
@@ -158,25 +151,26 @@ describe("issuer", () => {
         expect(issuer.keys).toStrictEqual([newKey1, newKey2])
       })
 
-      it("generates a random kid when none provided", () => {
+      it("generates a random kid when no kid was provided", () => {
         const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
         const { kid } = issuer.generateKey()
         expect(kid).toMatch(/^[0-9a-f]{40}$/)
       })
 
-      it("uses the kid when provided", () => {
+      it("uses provided kid", () => {
         const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
         const { kid } = issuer.generateKey("KID1")
         expect(kid).toBe("KID1")
       })
     })
+
     describe("kid", () => {
-      it("fails when no issuer has no key", () => {
+      it("fails when the issuer has not generated a key yet", () => {
         const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
         expect(() => issuer.kid()).toThrow(/No key/)
       })
 
-      it("fails when key does not exist", () => {
+      it("fails when no key at the provided index exists", () => {
         const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
         issuer.addKey('KID1', privateKey, publicKey)
         expect(() => issuer.kid(1)).toThrow(/No key/)
@@ -189,7 +183,7 @@ describe("issuer", () => {
         expect(issuer.kid()).toStrictEqual("KID1")
       })
 
-      it("returns the kid with specified index", () => {
+      it("returns the kid at the specified index", () => {
         const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
         issuer.addKey('KID1', privateKey, publicKey)
         issuer.addKey('KID2', privateKey, publicKey)
@@ -198,7 +192,7 @@ describe("issuer", () => {
     })
 
     describe("sign", () => {
-      it("create a signature", () => {
+      it("creates a signature", () => {
         const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
         issuer.addKey('KID1', privateKey, publicKey)
         const jwt = issuer.createSampleJwt()
@@ -247,7 +241,8 @@ describe("issuer", () => {
               e,
               kid: 'KID1',
               kty: 'RSA',
-              n
+              n,
+              use: 'sig'
             }
           ]
         })
@@ -302,7 +297,7 @@ describe("issuer", () => {
         vi.useRealTimers()
       })
 
-      it("sets the expired time of 60 minutes", () => {
+      it("sets the expired time to 60 in the future", () => {
         const issuer = new Issuer("https://example.com/keys.json")
         expect(issuer.samplePayload()).toStrictEqual({ exp: frozenTimestampSeconds + 30 * 60 })
       })

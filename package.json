@@ -29,7 +29,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "validate": "tsc --noEmit",
-    "all": "npm run lint && npm run build && npm run test:coverage"
+    "all": "npm run validate && npm run lint && npm run build && npm run test:coverage"
   },
   "repository": {
     "type": "git",
