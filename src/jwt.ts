@@ -74,7 +74,7 @@ export function jsonbase64url(input: Parameters<typeof JSON.stringify>[0]): stri
  *
  * @param header - The header of the JWT token
  * @param payload - Claims that represent the payload of your JWT
- * @param signature - The signature of the token as a string. You can ommit the parameter for unsigned tokens
+ * @param signature - The signature of the token as a string. You can omit the parameter for unsigned tokens
  * @returns the encoded token
  */
 export function joinJwt(header: JOSEHeader, payload: JWTClaims, signature?: string): string {

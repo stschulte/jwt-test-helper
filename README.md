@@ -7,7 +7,7 @@
 As a developer we provide APIs to protected resources. A lot of APIs require
 JSON Web Tokens for access and validating tokens correctly becomes vital.
 
-No matter wether you use a library to validate your tokens (like 
+No matter whether you use a library to validate your tokens (like
 [jsonwebtoken][jsonwebtoken] or [aws-jwt-verify][aws-jwt-verify]) or you have
 written your own code, testing out different scenarios can be really hard.
 
@@ -177,7 +177,7 @@ This library helps with two steps:
 
 The first thing we have to do is emulate the token issuer that you actually
 use in your code (or emulate another token issuer to test out scenarios
-wether you reject valid tokens that come from unexpected token issuers)
+whether you reject valid tokens that come from unexpected token issuers)
 
 The following issuer represents an EntraID V2 token issuer but you can
 emulate any token issuer that uses RSA keys to sign tokens.

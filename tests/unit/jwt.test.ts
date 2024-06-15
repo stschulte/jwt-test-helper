@@ -218,7 +218,7 @@ describe("jwt", () => {
     })
 
     describe("updateClaims", () => {
-      it("merges new fiels with the payload", () => {
+      it("merges new fields with the payload", () => {
         const fakeJwt = issuer.createJwt({ alg: 'RS256', kid: 'K1' }, { iss: 'bob', sub: 'Alice' })
         fakeJwt.updateClaims({ aud: 'https://example.com', sub: 'Joe' })
         expect(fakeJwt.payload).toStrictEqual({ aud: 'https://example.com', iss: 'bob', sub: 'Joe' })
@@ -230,7 +230,7 @@ describe("jwt", () => {
     })
 
     describe("updateHeader", () => {
-      it("merges new fiels with the header", () => {
+      it("merges new fields with the header", () => {
         const fakeJwt = issuer.createJwt({ alg: 'RS256', kid: 'K1' }, { iss: 'bob', sub: 'Alice' })
         fakeJwt.updateHeader({ kid: 'K2', typ: 'JWT' })
         expect(fakeJwt.header).toStrictEqual({ alg: 'RS256', kid: 'K2', typ: 'JWT' })

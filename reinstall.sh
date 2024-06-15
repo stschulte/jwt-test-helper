@@ -5,15 +5,20 @@
 # Small script to freshly start over installing all
 # dependencies.
 #
-# Can you be used to upgrade all dependencies, so be
-# carefull executing this.
+# Script can be used to upgrade all dependencies to
+# to the latest version by simply having npm figure out
+# the dependency tree again.
+#
+# Be careful as this will also upgrade over major versions
+
 set -e
 
-DEPS=(
+RUNTIME_DEPENDENCIES=(
   "tslib"
   "nock"
 )
-DDEPS=(
+
+BUILDTIME_DEPENDENCIES=(
     "typescript"
     "@types/node"
     "eslint"
@@ -31,7 +36,7 @@ if [[ ! -f package.json ]]; then
 fi
 
 echo "Cleanup"
-rm -rf node_modules package-lock.json aws-sdk-client-mock-vitest-*.tgz coverage dist-cjs dist-es dist-types
+rm -rf node_modules package-lock.json *.tgz coverage dist
 sed -i \
   -e '/^  "dependencies"/,/^  \}/D' \
   -e '/^  "devDependencies"/,/^  \}/D' \
@@ -40,15 +45,15 @@ sed -i \
 
 
 echo ">> Installing dependencies"
-for PKG in "${DEPS[@]}"; do
+for PKG in "${RUNTIME_DEPENDENCIES[@]}"; do
   echo " * ${PKG}"
 done
-npm install "${DEPS[@]}"
+npm install "${RUNTIME_DEPENDENCIES[@]}"
 
 echo ">> Installing development dependencies"
-for PKG in "${DDEPS[@]}"; do
+for PKG in "${BUILDTIME_DEPENDENCIES[@]}"; do
   echo " * ${PKG}"
 done
-npm install --save-dev "${DDEPS[@]}"
+npm install --save-dev "${BUILDTIME_DEPENDENCIES[@]}"
 
 echo ">> DONE"
