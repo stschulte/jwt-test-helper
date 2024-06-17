@@ -5,7 +5,7 @@ import type { JWK, JWKSet } from './jwk.js'
 import type { JOSEHeader, JWSAlgorithm, JWTClaims } from './jwt.js'
 
 import { rsaKeyToJwk } from './jwk.js'
-import { JWT, joinJwt } from './jwt.js'
+import { JWT, jsonbase64url } from './jwt.js'
 
 export class AlgorithmNotSupportedError extends Error { }
 export class KeyIdNotFoundError extends Error { }
@@ -85,7 +85,11 @@ export abstract class BaseIssuer<CustomJWTClaims extends JWTClaims = JWTClaims, 
       throw new KeyIdNotFoundError(`Fake issuer has no key with kid ${kid}. Did you run generateKey first?`)
     }
 
-    const signPayload = joinJwt(jwt.header, jwt.payload)
+    const signPayload = [
+      jsonbase64url(jwt.header),
+      jsonbase64url(jwt.payload)
+    ].join(".")
+
     const signer = createSign(jwsToCryptoAlgorithm(alg))
     signer.write(signPayload)
     signer.end()
