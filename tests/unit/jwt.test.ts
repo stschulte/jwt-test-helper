@@ -241,5 +241,17 @@ describe("jwt", () => {
       })
     })
 
+    describe("unknownKid", () => {
+      it("sets a random key id", () => {
+        const fakeJwt = issuer.createJwt({ alg: 'RS256', kid: 'K1' }, { iss: 'bob', sub: 'Alice' })
+        fakeJwt.unknownKid()
+        expect(fakeJwt.header.kid).not.toBe("K1")
+        expect(fakeJwt.header.kid).toMatch(/^[0-9a-z]{40}$/)
+      })
+
+      it("returns itself", () => {
+        expect(jwt.unknownKid()).toBe(jwt)
+      })
+    })
   })
 })

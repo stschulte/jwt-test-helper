@@ -1,3 +1,5 @@
+import { randomBytes } from 'node:crypto'
+
 import { BaseIssuer } from './issuer.js'
 
 /**
@@ -142,6 +144,11 @@ export class JWT<CustomClaims extends JWTClaims = JWTClaims> {
       return joinJwt(this.header, this.payload)
     }
     return joinJwt(this.header, this.payload, this.signature)
+  }
+
+  unknownKid(): this {
+    this.header.kid = randomBytes(20).toString('hex')
+    return this
   }
 
   updateClaims(claims: Partial<CustomClaims>): this {

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- new method on JWT `unknownKid()` to generate a random value for the `kid`
+  header. This normally causes the `kid` to not match any previously generated
+  key
+
 ## [0.9.3] - 2024-06-13
 
 ### Fixed
