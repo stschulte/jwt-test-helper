@@ -131,6 +131,17 @@ describe("jwt", () => {
       })
     })
 
+    describe("withIssuer", () => {
+      it("updates the iss claim", () => {
+        jwt.withIssuer("https://issuer.net")
+        expect(jwt.payload.iss).toBe("https://issuer.net")
+      })
+
+      it("updates itself", () => {
+        expect(jwt.withIssuer("https://issuer.net")).toBe(jwt)
+      })
+    })
+
     describe("sign", () => {
       it("updates the signature", () => {
         const expectedSignature = issuer.sign(jwt)

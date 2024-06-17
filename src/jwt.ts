@@ -161,12 +161,17 @@ export class JWT<CustomClaims extends JWTClaims = JWTClaims> {
     return this
   }
 
-  withAudience(aud: NonNullable<CustomClaims["aud"]>) {
+  withAudience(aud: NonNullable<CustomClaims["aud"]>): this {
     this.payload.aud = aud
     return this
   }
 
-  withSubject(sub: NonNullable<CustomClaims["sub"]>) {
+  withIssuer(iss: NonNullable<CustomClaims["iss"]>): this {
+    this.payload.iss = iss
+    return this
+  }
+
+  withSubject(sub: NonNullable<CustomClaims["sub"]>): this {
     this.payload.sub = sub
     return this
   }
