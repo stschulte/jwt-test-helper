@@ -1,5 +1,5 @@
 import nock from 'nock'
-import { KeyObject, generateKeyPairSync } from 'node:crypto'
+import { KeyObject, generateKeyPairSync, verify } from 'node:crypto'
 import { get } from 'node:https'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -192,11 +192,20 @@ describe("issuer", () => {
     })
 
     describe("sign", () => {
-      it("creates a signature", () => {
+      it("creates a valid signature", () => {
         const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
         issuer.addKey('KID1', privateKey, publicKey)
         const jwt = issuer.createSampleJwt()
         const signature = issuer.sign(jwt)
+
+        const jwtWithoutSignature = jwt.toString().split(".", 2).join(".")
+
+        if(signature) {
+          expect(verify('RSA-SHA256', Buffer.from(jwtWithoutSignature), publicKey, Buffer.from(signature, 'base64url'))).toBeTruthy()
+        }
+        else {
+          expect(false).toBeTruthy()
+        }
 
         expect(signature).not.toBeUndefined()
         expect(signature).toMatch(/\S+/)
