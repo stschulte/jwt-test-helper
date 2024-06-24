@@ -1,6 +1,6 @@
 {
   "name": "jwt-test-helper",
-  "version": "0.10.0",
+  "version": "1.0.0",
   "description": "Create different JSON Web Tokens for tests",
   "type": "module",
   "module": "./dist/index.js",
