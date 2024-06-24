@@ -225,6 +225,39 @@ describe("issuer", () => {
         const jwt = issuer.createSampleJwt({ kid: 'foo' })
         expect(() => issuer.sign(jwt)).toThrow(/no key with kid foo/)
       })
+
+      it("allows to overwrite signing kid", () => {
+        const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
+        issuer.addKey('KID1', privateKey, publicKey)
+
+        // Generate a second key
+        const secondKey = issuer.generateKey()
+
+        const jwt = issuer.createSampleJwt({kid: 'KID1'})
+
+        // Force to sign with the KID of the second key, eventhough the
+        // kid header demands the first key
+        const signature = issuer.sign(jwt, secondKey.kid)
+
+        const jwtWithoutSignature = jwt.toString().split(".", 2).join(".")
+
+        if(signature) {
+          expect(verify('RSA-SHA256', Buffer.from(jwtWithoutSignature), secondKey.publicKey, Buffer.from(signature, 'base64url'))).toBeTruthy()
+        }
+        else {
+          expect(false).toBeTruthy()
+        }
+
+        expect(signature).not.toBeUndefined()
+        expect(signature).toMatch(/\S+/)
+      })
+
+      it("fails when force_kid is not present", () => {
+        const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
+        issuer.addKey('KID1', privateKey, publicKey)
+        const jwt = issuer.createSampleJwt({ kid: 'KID1' })
+        expect(() => issuer.sign(jwt, 'NON_EXISTING_KID')).toThrow(/no key with kid/)
+      })
     })
 
     describe("mockJwksUri", () => {

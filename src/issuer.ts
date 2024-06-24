@@ -74,13 +74,14 @@ export abstract class BaseIssuer<CustomJWTClaims extends JWTClaims = JWTClaims, 
     return scope
   }
 
-  sign(jwt: JWT): null | string {
+  sign(jwt: JWT, force_kid?: string): null | string {
     const { alg, kid } = jwt.header
     if (!alg || alg === 'none') {
       return null
     }
 
-    const key = this.keys.find(k => k.kid === kid)
+    const desired_kid = force_kid ? force_kid : kid
+    const key = this.keys.find(k => k.kid === desired_kid)
     if (!key) {
       throw new KeyIdNotFoundError(`Fake issuer has no key with kid ${kid}. Did you run generateKey first?`)
     }
