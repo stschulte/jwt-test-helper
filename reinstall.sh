@@ -37,12 +37,11 @@ fi
 
 echo "Cleanup"
 rm -rf node_modules package-lock.json *.tgz coverage dist
-sed -i \
-  -e '/^  "dependencies"/,/^  \}/D' \
-  -e '/^  "devDependencies"/,/^  \}/D' \
-  -e 's/^\(  "homepage".*\),$/\1/' \
-  package.json
 
+NEW_PACKAGE_JSON=`mktemp package.json.XXXXXXXXXX`
+chmod 0644 "$NEW_PACKAGE_JSON"
+jq 'del(.dependencies, .devDependencies)' package.json > "$NEW_PACKAGE_JSON"
+mv "$NEW_PACKAGE_JSON" package.json
 
 echo ">> Installing dependencies"
 for PKG in "${RUNTIME_DEPENDENCIES[@]}"; do
