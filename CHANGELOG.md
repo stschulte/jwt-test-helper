@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - New method on JWT `withoutKeyId` allows to easily remove an existing `kid` header
+- New issuer method `signString` allows to sign arbitrary strings. This allows
+  to validate against completly invalid JWTs, e.g. a payload that does not
+  represent a correct JSON object
 
 ## [1.0.0] - 2024-06-24
 

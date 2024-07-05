@@ -81,15 +81,24 @@ export abstract class BaseIssuer<CustomJWTClaims extends JWTClaims = JWTClaims, 
     }
 
     const desired_kid = force_kid ? force_kid : kid
-    const key = this.keys.find(k => k.kid === desired_kid)
-    if (!key) {
-      throw new KeyIdNotFoundError(`Fake issuer has no key with kid ${kid}. Did you run generateKey first?`)
+
+    if(!desired_kid) {
+      throw new KeyIdNotFoundError('Unable to sign a JWT without a kid header when no force_kid is provided')
     }
 
     const signPayload = [
       jsonbase64url(jwt.header),
       jsonbase64url(jwt.payload)
     ].join(".")
+
+    return this.signString(desired_kid, alg, signPayload)
+  }
+
+  signString(kid: string, alg: JWSAlgorithm, signPayload: string): string {
+    const key = this.keys.find(k => k.kid === kid)
+    if (!key) {
+      throw new KeyIdNotFoundError(`Fake issuer has no key with kid ${kid}. Did you run generateKey first?`)
+    }
 
     const signer = createSign(jwsToCryptoAlgorithm(alg))
     signer.write(signPayload)

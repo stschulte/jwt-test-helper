@@ -226,6 +226,13 @@ describe("issuer", () => {
         expect(() => issuer.sign(jwt)).toThrow(/no key with kid foo/)
       })
 
+      it("fails when jwt does not have a kid header", () => {
+        const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
+        issuer.addKey('KID1', privateKey, publicKey)
+        const jwt = issuer.createSampleJwt().withoutKeyId()
+        expect(() => issuer.sign(jwt)).toThrow(/Unable to sign a JWT without a kid header/)
+      })
+
       it("allows to overwrite signing kid", () => {
         const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
         issuer.addKey('KID1', privateKey, publicKey)
@@ -257,6 +264,25 @@ describe("issuer", () => {
         issuer.addKey('KID1', privateKey, publicKey)
         const jwt = issuer.createSampleJwt({ kid: 'KID1' })
         expect(() => issuer.sign(jwt, 'NON_EXISTING_KID')).toThrow(/no key with kid/)
+      })
+    })
+
+    describe("signString", () => {
+      it("signs arbitrary strings", () => {
+        const issuer = new SimpleIssuer(new URL("https://example.com/keys.json"))
+        issuer.addKey('KID1', privateKey, publicKey)
+        const invalidHeader = '{"kid": "KID1"'
+        const invalidPayload = 'Hello'
+        const signPayload = [
+          Buffer.from(invalidHeader).toString('base64url'),
+          Buffer.from(invalidPayload).toString('base64url')
+        ].join(".")
+        const signature = issuer.signString('KID1', 'RS256', signPayload)
+
+        expect(verify('RSA-SHA256', Buffer.from(signPayload), publicKey, Buffer.from(signature, 'base64url'))).toBeTruthy()
+
+        expect(signature).not.toBeUndefined()
+        expect(signature).toMatch(/\S+/)
       })
     })
 
