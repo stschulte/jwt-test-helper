@@ -175,4 +175,9 @@ export class JWT<CustomClaims extends JWTClaims = JWTClaims> {
     this.payload.sub = sub
     return this
   }
+
+  withoutKeyId(): this {
+    delete this.header.kid
+    return this
+  }
 }

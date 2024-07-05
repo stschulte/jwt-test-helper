@@ -264,5 +264,19 @@ describe("jwt", () => {
         expect(jwt.unknownKid()).toBe(jwt)
       })
     })
+
+    describe("withoutKeyId", () => {
+      it("removes an existing kid header", () => {
+        const fakeJwt = issuer.createJwt({ alg: 'RS256', kid: 'K1' }, { iss: 'bob', sub: 'Alice' }).withoutKeyId()
+        expect(fakeJwt.header.kid).toBeUndefined()
+        expect(fakeJwt.header).toStrictEqual({alg: 'RS256'})
+      })
+
+      it("does nothing when kid already absent", () => {
+        const fakeJwt = issuer.createJwt({ alg: 'RS256' }, { iss: 'bob', sub: 'Alice' }).withoutKeyId()
+        expect(fakeJwt.header.kid).toBeUndefined()
+        expect(fakeJwt.header).toStrictEqual({alg: 'RS256'})
+      })
+    })
   })
 })

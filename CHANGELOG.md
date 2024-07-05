@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New method on JWT `withoutKeyId` allows to easily remove an existing `kid` header
+
 ## [1.0.0] - 2024-06-24
 
 ### Added
