@@ -11,16 +11,15 @@ export type JWSAlgorithm = 'ES256'
   | 'ES384'
   | 'ES512'
   | 'HS256'
-  | 'HS256'
   | 'HS384'
   | 'HS512'
+  | 'none'
   | 'PS256'
   | 'PS384'
   | 'PS512'
   | 'RS256'
   | 'RS384'
   | 'RS512'
-  | 'none'
 
 /**
  * Registered Header Parameter names according to
@@ -109,6 +108,10 @@ export class JWT<CustomClaims extends JWTClaims = JWTClaims> {
     return this
   }
 
+  expired(): this {
+    return this.expireInSeconds(-60)
+  }
+
   expireInSeconds(seconds: number): this {
     this.payload.exp = Math.floor(Date.now() / 1000 + seconds)
     return this
@@ -116,10 +119,6 @@ export class JWT<CustomClaims extends JWTClaims = JWTClaims> {
 
   expireNow(): this {
     return this.expireInSeconds(0)
-  }
-
-  expired(): this {
-    return this.expireInSeconds(-60)
   }
 
   prettyPrint(includeSignature: boolean = false): string {
@@ -131,8 +130,8 @@ export class JWT<CustomClaims extends JWTClaims = JWTClaims> {
     ].join(".")
   }
 
-  sign(): this {
-    const signature = this.issuer.sign(this)
+  sign(kid?: string): this {
+    const signature = this.issuer.sign(this, kid)
     if (signature) {
       this.signature = signature
     }
@@ -171,13 +170,13 @@ export class JWT<CustomClaims extends JWTClaims = JWTClaims> {
     return this
   }
 
-  withSubject(sub: NonNullable<CustomClaims["sub"]>): this {
-    this.payload.sub = sub
+  withoutKeyId(): this {
+    delete this.header.kid
     return this
   }
 
-  withoutKeyId(): this {
-    delete this.header.kid
+  withSubject(sub: NonNullable<CustomClaims["sub"]>): this {
+    this.payload.sub = sub
     return this
   }
 }

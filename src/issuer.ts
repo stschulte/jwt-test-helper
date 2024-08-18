@@ -1,11 +1,11 @@
 import nock from 'nock'
-import { KeyObject, createSign, generateKeyPairSync, randomBytes } from 'node:crypto'
+import { createSign, generateKeyPairSync, KeyObject, randomBytes } from 'node:crypto'
 
 import type { JWK, JWKSet } from './jwk.js'
 import type { JOSEHeader, JWSAlgorithm, JWTClaims } from './jwt.js'
 
 import { rsaKeyToJwk } from './jwk.js'
-import { JWT, jsonbase64url } from './jwt.js'
+import { jsonbase64url, JWT } from './jwt.js'
 
 export class AlgorithmNotSupportedError extends Error { }
 export class KeyIdNotFoundError extends Error { }
@@ -33,7 +33,7 @@ export abstract class BaseIssuer<CustomJWTClaims extends JWTClaims = JWTClaims, 
   jwksUri: URL
   keys: FakeKey[]
 
-  constructor(jwksUri: URL | string) {
+  constructor(jwksUri: string | URL) {
     this.jwksUri = jwksUri instanceof URL ? jwksUri : new URL(jwksUri)
     this.keys = []
   }
@@ -58,6 +58,8 @@ export abstract class BaseIssuer<CustomJWTClaims extends JWTClaims = JWTClaims, 
     return this.addKey(keyId, privateKey, publicKey)
   }
 
+  abstract keyToJwk(key: FakeKey): CustomJWK
+
   kid(index = 0): string {
     const kid = this.keys[index]?.kid
     if (!kid) {
@@ -74,9 +76,13 @@ export abstract class BaseIssuer<CustomJWTClaims extends JWTClaims = JWTClaims, 
     return scope
   }
 
+  abstract sampleHeader(): JOSEHeader
+
+  abstract samplePayload(): CustomJWTClaims
+
   sign(jwt: JWT, force_kid?: string): null | string {
     const { alg, kid } = jwt.header
-    if (!alg || alg === 'none') {
+    if (alg === 'none') {
       return null
     }
 
@@ -93,7 +99,6 @@ export abstract class BaseIssuer<CustomJWTClaims extends JWTClaims = JWTClaims, 
 
     return this.signString(desired_kid, alg, signPayload)
   }
-
   signString(kid: string, alg: JWSAlgorithm, signPayload: string): string {
     const key = this.keys.find(k => k.kid === kid)
     if (!key) {
@@ -106,14 +111,9 @@ export abstract class BaseIssuer<CustomJWTClaims extends JWTClaims = JWTClaims, 
 
     return signer.sign(key.privateKey, 'base64url')
   }
-
-  abstract keyToJwk(key: FakeKey): CustomJWK
-
-  abstract sampleHeader(): JOSEHeader
-  abstract samplePayload(): CustomJWTClaims
 }
 
-export class Issuer extends BaseIssuer<JWTClaims, JWK> {
+export class Issuer extends BaseIssuer {
   keyToJwk(key: FakeKey): JWK {
     return rsaKeyToJwk(key.kid, key.publicKey)
   }

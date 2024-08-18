@@ -3,7 +3,7 @@ import { KeyObject } from "node:crypto"
 class NoRSAKey extends Error { }
 
 // https://www.rfc-editor.org/rfc/rfc7518.html#page-28
-type KeyType = 'EC' | 'RSA' | 'oct'
+type KeyType = 'EC' | 'oct' | 'RSA'
 type PublicKeyUse = 'enc' | 'sig'
 type KeyOperations = 'decrypt' | 'deriveBits' | 'deriveKey' | 'encrypt' | 'sign' | 'unwrapKey' | 'verify' | 'wrapKey'
 
@@ -20,6 +20,7 @@ type Alg = "A128CBC-HS256"
   | "A256GCM"
   | "A256GCMKW"
   | "A256KW"
+  | "dir"
   | "ECDH-ES"
   | "ECDH-ES+A128KW"
   | "ECDH-ES+A192KW"
@@ -30,6 +31,7 @@ type Alg = "A128CBC-HS256"
   | "HS256"
   | "HS384"
   | "HS512"
+  | "none"
   | "PBES2-HS256+A128KW"
   | "PBES2-HS384+A192KW"
   | "PBES2-HS512+A256KW"
@@ -42,8 +44,6 @@ type Alg = "A128CBC-HS256"
   | "RSA-OAEP"
   | "RSA-OAEP-256"
   | "RSA1_5"
-  | "dir"
-  | "none"
 
 // https://datatracker.ietf.org/doc/html/rfc7517#section-4
 export type JWKCommon = {

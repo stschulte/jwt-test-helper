@@ -1,7 +1,7 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Issuer } from '../../src/issuer.js'
-import { JWT, joinJwt, jsonbase64url } from '../../src/jwt.js'
+import { joinJwt, jsonbase64url, JWT } from '../../src/jwt.js'
 
 describe("jwt", () => {
   describe("jsonbase64url", () => {
@@ -181,7 +181,7 @@ describe("jwt", () => {
 
         it("prints the complete signature on includeSignature", () => {
           const signedJwt = issuer.createJwt({ alg: 'RS256', kid: 'K1' }, { iss: 'bob', sub: 'Alice' }).sign()
-          const signature = signedJwt.signature
+          const signature = signedJwt.signature ?? ''
           expect(signedJwt.prettyPrint(true)).toBe(`{
   "alg": "RS256",
   "kid": "K1"
@@ -223,7 +223,7 @@ describe("jwt", () => {
 
       it("should return a signed token", () => {
         const signedJwt = issuer.createJwt({ alg: 'RS256', kid: 'K1' }, { iss: 'bob', sub: 'Alice' }).sign()
-        const signature = signedJwt.signature
+        const signature = signedJwt.signature ?? ''
         expect(signedJwt.toString()).toBe(`eyJhbGciOiJSUzI1NiIsImtpZCI6IksxIn0.eyJpc3MiOiJib2IiLCJzdWIiOiJBbGljZSJ9.${signature}`)
       })
     })
@@ -236,7 +236,7 @@ describe("jwt", () => {
       })
 
       it("returns itself", () => {
-        expect(jwt.updateClaims({sub: 'Alice'})).toBe(jwt)
+        expect(jwt.updateClaims({ sub: 'Alice' })).toBe(jwt)
       })
     })
 
@@ -269,13 +269,13 @@ describe("jwt", () => {
       it("removes an existing kid header", () => {
         const fakeJwt = issuer.createJwt({ alg: 'RS256', kid: 'K1' }, { iss: 'bob', sub: 'Alice' }).withoutKeyId()
         expect(fakeJwt.header.kid).toBeUndefined()
-        expect(fakeJwt.header).toStrictEqual({alg: 'RS256'})
+        expect(fakeJwt.header).toStrictEqual({ alg: 'RS256' })
       })
 
       it("does nothing when kid already absent", () => {
         const fakeJwt = issuer.createJwt({ alg: 'RS256' }, { iss: 'bob', sub: 'Alice' }).withoutKeyId()
         expect(fakeJwt.header.kid).toBeUndefined()
-        expect(fakeJwt.header).toStrictEqual({alg: 'RS256'})
+        expect(fakeJwt.header).toStrictEqual({ alg: 'RS256' })
       })
     })
   })

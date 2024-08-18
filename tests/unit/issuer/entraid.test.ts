@@ -1,4 +1,4 @@
-import { KeyObject, generateKeyPairSync } from 'node:crypto'
+import { generateKeyPairSync, KeyObject } from 'node:crypto'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { EntraIdIssuer, EntraIdV2Issuer } from "../../../src/issuer/entraid.js"

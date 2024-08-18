@@ -1,5 +1,5 @@
 import nock from 'nock'
-import { KeyObject, generateKeyPairSync, verify } from 'node:crypto'
+import { generateKeyPairSync, KeyObject, verify } from 'node:crypto'
 import { get } from 'node:https'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -14,18 +14,20 @@ async function fetchJwk(url: string): Promise<JWKSet> {
   return new Promise((resolve, reject) => {
     get(url, (response) => {
       let body = ""
-      response.on('data', (chunk) => {
+      response.on('data', (chunk: string) => {
         body += chunk
       })
 
-      response.on('error', (error) => reject(error))
+      response.on('error', (error) => { reject(error); })
 
       response.on('end', () => {
         try {
-          const json = JSON.parse(body)
-          return resolve(json)
+          /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+          const json: JWKSet = JSON.parse(body)
+          resolve(json); return;
         }
         catch (error) {
+          /* eslint-disable @typescript-eslint/prefer-promise-reject-errors */
           reject(error)
         }
       })
