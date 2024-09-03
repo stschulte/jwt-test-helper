@@ -42,18 +42,19 @@
   },
   "homepage": "https://github.com/stschulte/jwt-test-helper#readme",
   "dependencies": {
-    "nock": "^13.5.4",
-    "tslib": "^2.6.3"
+    "nock": "^13.5.5",
+    "tslib": "^2.7.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.9.0",
-    "@types/node": "^22.4.1",
+    "@eslint/js": "^9.9.1",
+    "@stylistic/eslint-plugin": "^2.7.2",
+    "@types/node": "^22.5.2",
     "@vitest/coverage-v8": "^2.0.5",
-    "eslint": "^9.9.0",
-    "eslint-config-flat-gitignore": "^0.1.8",
-    "eslint-plugin-perfectionist": "^3.2.0",
+    "eslint": "^9.9.1",
+    "eslint-config-flat-gitignore": "^0.3.0",
+    "eslint-plugin-perfectionist": "^3.3.0",
     "typescript": "^5.5.4",
-    "typescript-eslint": "^8.2.0",
+    "typescript-eslint": "^8.4.0",
     "vitest": "^2.0.5"
   }
 }

@@ -1,7 +1,9 @@
 import eslint from "@eslint/js";
 import gitignore from "eslint-config-flat-gitignore";
 import perfectionist from 'eslint-plugin-perfectionist'
+import stylistic from "@stylistic/eslint-plugin";
 import tseslint from "typescript-eslint";
+
 
 export default tseslint.config(
   gitignore(),
@@ -20,5 +22,10 @@ export default tseslint.config(
     files: ['**/*.js'],
     ...tseslint.configs.disableTypeChecked,
   },
-  perfectionist.configs["recommended-natural"]
+  perfectionist.configs["recommended-natural"],
+  stylistic.configs.customize({
+    indent: 2,
+    quotes: 'single',
+    semi: true,
+  })
 );

@@ -21,11 +21,14 @@ RUNTIME_DEPENDENCIES=(
 BUILDTIME_DEPENDENCIES=(
     "typescript"
     "@types/node"
+
     "eslint"
     "@eslint/js"
     "eslint-config-flat-gitignore"
     "eslint-plugin-perfectionist"
+    "@stylistic/eslint-plugin"
     "typescript-eslint"
+
     "vitest"
     "@vitest/coverage-v8"
 )
