@@ -1,6 +1,6 @@
-import { randomBytes } from 'node:crypto'
+import { randomBytes } from 'node:crypto';
 
-import { BaseIssuer } from './issuer.js'
+import { BaseIssuer } from './issuer.js';
 
 /**
  * Valid JWS Algorithms according to RFC7518 - JSON Web Algorithms (JWA)
@@ -19,7 +19,7 @@ export type JWSAlgorithm = 'ES256'
   | 'PS512'
   | 'RS256'
   | 'RS384'
-  | 'RS512'
+  | 'RS512';
 
 /**
  * Registered Header Parameter names according to
@@ -28,16 +28,16 @@ export type JWSAlgorithm = 'ES256'
  * [RFC7515](https://www.rfc-editor.org/rfc/rfc7515#section-4.1)
  */
 export interface JOSEHeader {
-  alg: JWSAlgorithm // Algorithm
-  crit?: string[] // Critical
-  cty?: string // Content Type
-  jku?: string  // JWK Set Url
-  jwk?: string // JSON Web Key
-  kid?: string // Key ID
-  typ?: string // Type
-  x5c?: string[] // X509 Certificate Chain
-  x5t?: string // X.509 Certificate SHA1-Thumbprint
-  x5u?: string // X.509 URL
+  alg: JWSAlgorithm; // Algorithm
+  crit?: string[]; // Critical
+  cty?: string; // Content Type
+  jku?: string; // JWK Set Url
+  jwk?: string; // JSON Web Key
+  kid?: string; // Key ID
+  typ?: string; // Type
+  x5c?: string[]; // X509 Certificate Chain
+  x5t?: string; // X.509 Certificate SHA1-Thumbprint
+  x5u?: string; // X.509 URL
 }
 
 /**
@@ -47,13 +47,13 @@ export interface JOSEHeader {
  * [RFC7519](https://www.rfc-editor.org/rfc/rfc7519#section-4)
  */
 export interface JWTClaims {
-  aud?: string | string[] // Audience(s)
-  exp?: number // Expiration Time
-  iat?: number // Issued At
-  iss?: string // Issuer
-  jti?: string // JWT ID
-  nbf?: number // Not Before
-  sub?: string  // Subject
+  aud?: string | string[]; // Audience(s)
+  exp?: number; // Expiration Time
+  iat?: number; // Issued At
+  iss?: string; // Issuer
+  jti?: string; // JWT ID
+  nbf?: number; // Not Before
+  sub?: string; // Subject
 }
 
 /**
@@ -63,7 +63,7 @@ export interface JWTClaims {
  * @returns The base64url encoded version of the object
  */
 export function jsonbase64url(input: Parameters<typeof JSON.stringify>[0]): string {
-  return Buffer.from(JSON.stringify(input)).toString('base64url')
+  return Buffer.from(JSON.stringify(input)).toString('base64url');
 }
 
 /**
@@ -82,101 +82,101 @@ export function joinJwt(header: JOSEHeader, payload: JWTClaims, signature?: stri
   return [
     jsonbase64url(header),
     jsonbase64url(payload),
-    signature ? signature : ''
-  ].join(".")
+    signature ? signature : '',
+  ].join('.');
 }
 
 export class JWT<CustomClaims extends JWTClaims = JWTClaims> {
-  header: JOSEHeader
-  issuer: BaseIssuer
-  payload: CustomClaims
-  signature?: string
+  header: JOSEHeader;
+  issuer: BaseIssuer;
+  payload: CustomClaims;
+  signature?: string;
 
   constructor(issuer: BaseIssuer, header: JOSEHeader, payload: CustomClaims) {
-    this.issuer = issuer
-    this.header = header
-    this.payload = payload
+    this.issuer = issuer;
+    this.header = header;
+    this.payload = payload;
   }
 
   becomesValidInSeconds(seconds: number): this {
-    this.payload.nbf = Math.floor(Date.now() / 1000 + seconds)
-    return this
+    this.payload.nbf = Math.floor(Date.now() / 1000 + seconds);
+    return this;
   }
 
   expireAt(exp: number): this {
-    this.payload.exp = exp
-    return this
+    this.payload.exp = exp;
+    return this;
   }
 
   expired(): this {
-    return this.expireInSeconds(-60)
+    return this.expireInSeconds(-60);
   }
 
   expireInSeconds(seconds: number): this {
-    this.payload.exp = Math.floor(Date.now() / 1000 + seconds)
-    return this
+    this.payload.exp = Math.floor(Date.now() / 1000 + seconds);
+    return this;
   }
 
   expireNow(): this {
-    return this.expireInSeconds(0)
+    return this.expireInSeconds(0);
   }
 
   prettyPrint(includeSignature: boolean = false): string {
-    const signature = this.signature ? includeSignature ? this.signature : '[Signature]' : '[No Signature]'
+    const signature = this.signature ? includeSignature ? this.signature : '[Signature]' : '[No Signature]';
     return [
       JSON.stringify(this.header, undefined, 2),
       JSON.stringify(this.payload, undefined, 2),
-      signature
-    ].join(".")
+      signature,
+    ].join('.');
   }
 
   sign(kid?: string): this {
-    const signature = this.issuer.sign(this, kid)
+    const signature = this.issuer.sign(this, kid);
     if (signature) {
-      this.signature = signature
+      this.signature = signature;
     }
-    return this
+    return this;
   }
 
   toString(): string {
     if (!this.signature) {
-      return joinJwt(this.header, this.payload)
+      return joinJwt(this.header, this.payload);
     }
-    return joinJwt(this.header, this.payload, this.signature)
+    return joinJwt(this.header, this.payload, this.signature);
   }
 
   unknownKid(): this {
-    this.header.kid = randomBytes(20).toString('hex')
-    return this
+    this.header.kid = randomBytes(20).toString('hex');
+    return this;
   }
 
   updateClaims(claims: Partial<CustomClaims>): this {
-    Object.assign(this.payload, claims)
-    return this
+    Object.assign(this.payload, claims);
+    return this;
   }
 
   updateHeader(header: Partial<JOSEHeader>): this {
-    Object.assign(this.header, header)
-    return this
+    Object.assign(this.header, header);
+    return this;
   }
 
-  withAudience(aud: NonNullable<CustomClaims["aud"]>): this {
-    this.payload.aud = aud
-    return this
+  withAudience(aud: NonNullable<CustomClaims['aud']>): this {
+    this.payload.aud = aud;
+    return this;
   }
 
-  withIssuer(iss: NonNullable<CustomClaims["iss"]>): this {
-    this.payload.iss = iss
-    return this
+  withIssuer(iss: NonNullable<CustomClaims['iss']>): this {
+    this.payload.iss = iss;
+    return this;
   }
 
   withoutKeyId(): this {
-    delete this.header.kid
-    return this
+    delete this.header.kid;
+    return this;
   }
 
-  withSubject(sub: NonNullable<CustomClaims["sub"]>): this {
-    this.payload.sub = sub
-    return this
+  withSubject(sub: NonNullable<CustomClaims['sub']>): this {
+    this.payload.sub = sub;
+    return this;
   }
 }
