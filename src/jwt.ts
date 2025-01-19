@@ -3,25 +3,6 @@ import { randomBytes } from 'node:crypto';
 import { BaseIssuer } from './issuer.js';
 
 /**
- * Valid JWS Algorithms according to RFC7518 - JSON Web Algorithms (JWA)
- *
- * [RFC7518](https://www.rfc-editor.org/rfc/rfc7518#section-3.1)
- */
-export type JWSAlgorithm = 'ES256'
-  | 'ES384'
-  | 'ES512'
-  | 'HS256'
-  | 'HS384'
-  | 'HS512'
-  | 'none'
-  | 'PS256'
-  | 'PS384'
-  | 'PS512'
-  | 'RS256'
-  | 'RS384'
-  | 'RS512';
-
-/**
  * Registered Header Parameter names according to
  * RFC 7515 - JSON Web Signatures
  *
@@ -41,6 +22,25 @@ export interface JOSEHeader {
 }
 
 /**
+ * Valid JWS Algorithms according to RFC7518 - JSON Web Algorithms (JWA)
+ *
+ * [RFC7518](https://www.rfc-editor.org/rfc/rfc7518#section-3.1)
+ */
+export type JWSAlgorithm = 'ES256'
+  | 'ES384'
+  | 'ES512'
+  | 'HS256'
+  | 'HS384'
+  | 'HS512'
+  | 'none'
+  | 'PS256'
+  | 'PS384'
+  | 'PS512'
+  | 'RS256'
+  | 'RS384'
+  | 'RS512';
+
+/**
  * Registered Claim Names according to
  * RFC 7519 - JSON Web Token (JWT)
  *
@@ -54,36 +54,6 @@ export interface JWTClaims {
   jti?: string; // JWT ID
   nbf?: number; // Not Before
   sub?: string; // Subject
-}
-
-/**
- * Encodes a JSON object to base64url
- *
- * @param input - an arbitrary object that can be represented as JSON
- * @returns The base64url encoded version of the object
- */
-export function jsonbase64url(input: Parameters<typeof JSON.stringify>[0]): string {
-  return Buffer.from(JSON.stringify(input)).toString('base64url');
-}
-
-/**
- * Creates a string representation of header, payload and signature
- *
- * @remarks
- * According to RFC 7519 Section 6 an unsigned JWT will have the signature part
- * represented as an empty string.
- *
- * @param header - The header of the JWT token
- * @param payload - Claims that represent the payload of your JWT
- * @param signature - The signature of the token as a string. You can omit the parameter for unsigned tokens
- * @returns the encoded token
- */
-export function joinJwt(header: JOSEHeader, payload: JWTClaims, signature?: string): string {
-  return [
-    jsonbase64url(header),
-    jsonbase64url(payload),
-    signature ? signature : '',
-  ].join('.');
 }
 
 export class JWT<CustomClaims extends JWTClaims = JWTClaims> {
@@ -179,4 +149,34 @@ export class JWT<CustomClaims extends JWTClaims = JWTClaims> {
     this.payload.sub = sub;
     return this;
   }
+}
+
+/**
+ * Creates a string representation of header, payload and signature
+ *
+ * @remarks
+ * According to RFC 7519 Section 6 an unsigned JWT will have the signature part
+ * represented as an empty string.
+ *
+ * @param header - The header of the JWT token
+ * @param payload - Claims that represent the payload of your JWT
+ * @param signature - The signature of the token as a string. You can omit the parameter for unsigned tokens
+ * @returns the encoded token
+ */
+export function joinJwt(header: JOSEHeader, payload: JWTClaims, signature?: string): string {
+  return [
+    jsonbase64url(header),
+    jsonbase64url(payload),
+    signature ? signature : '',
+  ].join('.');
+}
+
+/**
+ * Encodes a JSON object to base64url
+ *
+ * @param input - an arbitrary object that can be represented as JSON
+ * @returns The base64url encoded version of the object
+ */
+export function jsonbase64url(input: Parameters<typeof JSON.stringify>[0]): string {
+  return Buffer.from(JSON.stringify(input)).toString('base64url');
 }

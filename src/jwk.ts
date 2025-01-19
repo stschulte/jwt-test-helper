@@ -1,11 +1,44 @@
 import { KeyObject } from 'node:crypto';
 
-class NoRSAKey extends Error { }
+export type JWK = JWKEllipticCurvePublicKey | JWKRSAPublicKey | JWKSymmetricKey;
 
-// https://www.rfc-editor.org/rfc/rfc7518.html#page-28
-type KeyType = 'EC' | 'oct' | 'RSA';
-type PublicKeyUse = 'enc' | 'sig';
-type KeyOperations = 'decrypt' | 'deriveBits' | 'deriveKey' | 'encrypt' | 'sign' | 'unwrapKey' | 'verify' | 'wrapKey';
+// https://datatracker.ietf.org/doc/html/rfc7517#section-4
+export type JWKCommon = {
+  [key: string]: string | string[];
+  'alg'?: Alg; // Algorithm
+  'key_ops'?: KeyOperations[]; // Key Operations
+  'kid'?: string; // Key ID
+  'kty': KeyType; // Key Type MUST be present
+  'use'?: PublicKeyUse; // Public Key Use
+  'x5c'?: string[]; // X.509 Certificate Chain
+  'x5t'?: string; // X.509 Certificate SHA-1 Thumbprint
+  'x5t#S256'?: string; // X.509 Certificate SHA-256 Thumbprint
+  'x5u'?: string; // X.509 URL
+};
+// https://datatracker.ietf.org/doc/html/rfc7518#section-6.2
+export type JWKEllipticCurvePublicKey = JWKCommon & {
+  crv: 'P-256' | 'P-384' | 'P-521';
+  kty: 'EC';
+  x: string;
+  y: string;
+};
+// https://datatracker.ietf.org/doc/html/rfc7518#section-6.3.1
+export type JWKRSAPublicKey = JWKCommon & {
+  e: string;
+  kty: 'RSA';
+  n: string;
+};
+
+// https://datatracker.ietf.org/doc/html/rfc7517#section-5
+export interface JWKSet {
+  keys: JWK[];
+}
+
+// https://datatracker.ietf.org/doc/html/rfc7518#section-6.4
+export type JWKSymmetricKey = JWKCommon & {
+  k: string;
+  kty: 'oct';
+};
 
 // https://www.rfc-editor.org/rfc/rfc7518#section-7.1.2
 type Alg = 'A128CBC-HS256'
@@ -41,51 +74,18 @@ type Alg = 'A128CBC-HS256'
   | 'RS256'
   | 'RS384'
   | 'RS512'
+  | 'RSA1_5'
   | 'RSA-OAEP'
-  | 'RSA-OAEP-256'
-  | 'RSA1_5';
+  | 'RSA-OAEP-256';
 
-// https://datatracker.ietf.org/doc/html/rfc7517#section-4
-export type JWKCommon = {
-  [key: string]: string | string[];
-  'alg'?: Alg; // Algorithm
-  'key_ops'?: KeyOperations[]; // Key Operations
-  'kid'?: string; // Key ID
-  'kty': KeyType; // Key Type MUST be present
-  'use'?: PublicKeyUse; // Public Key Use
-  'x5c'?: string[]; // X.509 Certificate Chain
-  'x5t'?: string; // X.509 Certificate SHA-1 Thumbprint
-  'x5t#S256'?: string; // X.509 Certificate SHA-256 Thumbprint
-  'x5u'?: string; // X.509 URL
-};
+type KeyOperations = 'decrypt' | 'deriveBits' | 'deriveKey' | 'encrypt' | 'sign' | 'unwrapKey' | 'verify' | 'wrapKey';
 
-// https://datatracker.ietf.org/doc/html/rfc7518#section-6.2
-export type JWKEllipticCurvePublicKey = {
-  crv: 'P-256' | 'P-384' | 'P-521';
-  kty: 'EC';
-  x: string;
-  y: string;
-} & JWKCommon;
+// https://www.rfc-editor.org/rfc/rfc7518.html#page-28
+type KeyType = 'EC' | 'oct' | 'RSA';
 
-// https://datatracker.ietf.org/doc/html/rfc7518#section-6.3.1
-export type JWKRSAPublicKey = {
-  e: string;
-  kty: 'RSA';
-  n: string;
-} & JWKCommon;
+type PublicKeyUse = 'enc' | 'sig';
 
-// https://datatracker.ietf.org/doc/html/rfc7518#section-6.4
-export type JWKSymmetricKey = {
-  k: string;
-  kty: 'oct';
-} & JWKCommon;
-
-export type JWK = JWKEllipticCurvePublicKey | JWKRSAPublicKey | JWKSymmetricKey;
-
-// https://datatracker.ietf.org/doc/html/rfc7517#section-5
-export interface JWKSet {
-  keys: JWK[];
-}
+class NoRSAKey extends Error { }
 
 export function rsaKeyToJwk(kid: string, publicKey: KeyObject): JWKRSAPublicKey {
   const { e, n } = publicKey.export({ format: 'jwk' });

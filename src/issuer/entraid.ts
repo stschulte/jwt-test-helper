@@ -23,6 +23,12 @@ interface EntraIdClaims extends JWTClaims {
   ver: '1.0';
 }
 
+interface EntraIdJWK extends JWKRSAPublicKey {
+  kid: string;
+  kty: 'RSA';
+  use: 'sig';
+}
+
 interface EntraIdV2Claims extends JWTClaims {
   aio?: string;
   name?: string;
@@ -31,12 +37,6 @@ interface EntraIdV2Claims extends JWTClaims {
   preferred_username?: string;
   tid?: string;
   ver: '2.0';
-}
-
-interface EntraIdJWK extends JWKRSAPublicKey {
-  kid: string;
-  kty: 'RSA';
-  use: 'sig';
 }
 
 interface EntraIdV2JWK extends JWKRSAPublicKey {

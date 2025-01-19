@@ -10,6 +10,23 @@ import type { JOSEHeader, JWSAlgorithm, JWTClaims } from '../../src/jwt.js';
 import { BaseIssuer, Issuer, jwsToCryptoAlgorithm } from '../../src/issuer.js';
 import { rsaKeyToJwk } from '../../src/jwk.js';
 
+class SimpleIssuer extends BaseIssuer {
+  keyToJwk(key: FakeKey): JWK {
+    return rsaKeyToJwk(key.kid, key.publicKey);
+  }
+
+  sampleHeader(): JOSEHeader {
+    return {
+      alg: 'RS256',
+      kid: this.kid(),
+    };
+  }
+
+  samplePayload(): JWTClaims {
+    return { iss: 'bob', sub: 'Alice' };
+  }
+}
+
 async function fetchJwk(url: string): Promise<JWKSet> {
   return new Promise((resolve, reject) => {
     get(url, (response) => {
@@ -36,23 +53,6 @@ async function fetchJwk(url: string): Promise<JWKSet> {
       });
     });
   });
-}
-
-class SimpleIssuer extends BaseIssuer {
-  keyToJwk(key: FakeKey): JWK {
-    return rsaKeyToJwk(key.kid, key.publicKey);
-  }
-
-  sampleHeader(): JOSEHeader {
-    return {
-      alg: 'RS256',
-      kid: this.kid(),
-    };
-  }
-
-  samplePayload(): JWTClaims {
-    return { iss: 'bob', sub: 'Alice' };
-  }
 }
 
 describe('issuer', () => {

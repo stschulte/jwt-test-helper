@@ -7,29 +7,14 @@ import type { JOSEHeader, JWSAlgorithm, JWTClaims } from './jwt.js';
 import { rsaKeyToJwk } from './jwk.js';
 import { jsonbase64url, JWT } from './jwt.js';
 
-export class AlgorithmNotSupportedError extends Error { }
-export class KeyIdNotFoundError extends Error { }
-
-type SupportedCryptoAlgorithm = 'RSA-SHA256' | 'RSA-SHA384' | 'RSA-SHA512';
-
-export function jwsToCryptoAlgorithm(alg: JWSAlgorithm): SupportedCryptoAlgorithm {
-  if (alg === 'RS256') {
-    return 'RSA-SHA256';
-  }
-  else if (alg === 'RS384') {
-    return 'RSA-SHA384';
-  }
-  else if (alg === 'RS512') {
-    return 'RSA-SHA512';
-  }
-  throw new AlgorithmNotSupportedError(`The jwt-test-helper does not support the algorithm. Expected: RS256, RS384, RS512; Got: ${alg}`);
-}
-
 export interface FakeKey {
   kid: string;
   privateKey: KeyObject;
   publicKey: KeyObject;
 }
+type SupportedCryptoAlgorithm = 'RSA-SHA256' | 'RSA-SHA384' | 'RSA-SHA512';
+
+export class AlgorithmNotSupportedError extends Error { }
 
 export abstract class BaseIssuer<CustomJWTClaims extends JWTClaims = JWTClaims, CustomJWK extends JWK = JWK> {
   jwksUri: URL;
@@ -131,4 +116,19 @@ export class Issuer extends BaseIssuer {
   samplePayload(): JWTClaims {
     return { exp: Math.floor(Date.now() / 1000 + 1800) };
   }
+}
+
+export class KeyIdNotFoundError extends Error { }
+
+export function jwsToCryptoAlgorithm(alg: JWSAlgorithm): SupportedCryptoAlgorithm {
+  if (alg === 'RS256') {
+    return 'RSA-SHA256';
+  }
+  else if (alg === 'RS384') {
+    return 'RSA-SHA384';
+  }
+  else if (alg === 'RS512') {
+    return 'RSA-SHA512';
+  }
+  throw new AlgorithmNotSupportedError(`The jwt-test-helper does not support the algorithm. Expected: RS256, RS384, RS512; Got: ${alg}`);
 }
