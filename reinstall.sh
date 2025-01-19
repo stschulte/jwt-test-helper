@@ -24,10 +24,12 @@ BUILDTIME_DEPENDENCIES=(
 
     "eslint"
     "@eslint/js"
+    "@types/eslint__js"
     "eslint-config-flat-gitignore"
     "eslint-plugin-perfectionist"
     "@stylistic/eslint-plugin"
     "typescript-eslint"
+    "@vitest/eslint-plugin"
 
     "vitest"
     "@vitest/coverage-v8"
@@ -48,14 +50,21 @@ mv "$NEW_PACKAGE_JSON" package.json
 
 echo ">> Installing dependencies"
 for PKG in "${RUNTIME_DEPENDENCIES[@]}"; do
-  echo " * ${PKG}"
+  echo " ● ${PKG}"
 done
 npm install "${RUNTIME_DEPENDENCIES[@]}"
 
 echo ">> Installing development dependencies"
 for PKG in "${BUILDTIME_DEPENDENCIES[@]}"; do
-  echo " * ${PKG}"
+  echo " ● ${PKG}"
 done
 npm install --save-dev "${BUILDTIME_DEPENDENCIES[@]}"
 
 echo ">> DONE"
+
+echo ""
+echo "We reinstalled all dependencies. You may want to run"
+echo ""
+echo "    git diff package.json"
+echo ""
+echo "now"
