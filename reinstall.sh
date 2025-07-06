@@ -14,7 +14,6 @@
 set -e
 
 RUNTIME_DEPENDENCIES=(
-  "tslib"
   "nock"
 )
 
