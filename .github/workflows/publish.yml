@@ -6,6 +6,7 @@ on:
 
 permissions:
   id-token: write
+  contents: read
 
 jobs:
   release:
@@ -29,10 +30,10 @@ jobs:
           echo "tag=${tag}" >> $GITHUB_OUTPUT
           echo "version=${metadata_version}" >> $GITHUB_OUTPUT
 
-      - name: Setup Node 20
+      - name: Setup Node 22
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
@@ -43,5 +44,3 @@ jobs:
 
       - name: Publish
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
