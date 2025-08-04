@@ -1,7 +1,7 @@
 # JWT Test Helper
 
 [![CI Status](https://github.com/stschulte/jwt-test-helper/workflows/CI/badge.svg)](https://github.com/stschulte/jwt-test-helper/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/github/stschulte/jwt-test-helper/badge.svg?branch=main)](https://coveralls.io/github/stschulte/jwt-test-helper?branch=main)
+[![codecov](https://codecov.io/gh/stschulte/jwt-test-helper/graph/badge.svg?token=RN4OUC38VZ)](https://codecov.io/gh/stschulte/jwt-test-helper)
 [![npm version](https://badge.fury.io/js/jwt-test-helper.svg)](https://badge.fury.io/js/jwt-test-helper)
 
 As a developer we provide APIs to protected resources. A lot of APIs require
